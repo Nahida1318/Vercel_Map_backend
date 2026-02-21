@@ -18,7 +18,8 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^7.0.10",
-    "pg": "^8.11.5"
+    "pg": "^8.11.5",
+    "serverless-http": "^4.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
