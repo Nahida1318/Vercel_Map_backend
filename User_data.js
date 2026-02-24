@@ -36,6 +36,7 @@ router.post("/signup", async (req, res) => {
 
 
 router.post("/signin", async (req, res) => {
+  console.log("Signin route hit");
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -163,7 +164,7 @@ router.post("/history", async (req, res) => {
 });
 
 router.get("/history/:user_id", async (req, res) => {
-  user_id = req.params.user_id;
+  const user_id = req.params.user_id;
 
   try {
     const result = await db.query(
@@ -174,15 +175,17 @@ router.get("/history/:user_id", async (req, res) => {
     );
 
     console.log(result.rows);
-    res.send({ result: result.rows });
+    res.json({ result: result.rows });
+
   } catch (err) {
     console.error(err);
-    res.send(err);
+    res.status(500).json({ error: "Internal server error" });
+
   }
 });
 
 router.get("/favourite/:user_id", async (req, res) => {
-  user_id = req.params.user_id;
+  const user_id = req.params.user_id;
 
   try {
     const result = await db.query(
@@ -193,10 +196,12 @@ router.get("/favourite/:user_id", async (req, res) => {
     );
 
     console.log(result.rows);
-    res.send({ result: result.rows });
+    res.json({ result: result.rows });
+
   } catch (err) {
     console.error(err);
-    res.send(err);
+    res.status(500).json({ error: "Internal server error" });
+
   }
 });
 
@@ -250,9 +255,48 @@ router.get("/user/:user_id", async (req, res) => {
       });
   } catch (err) {
     console.error(err);
-    res.send(err);
+    res.status(500).json({ error: "Internal server error" });
+
   }
 });
+
+
+
+
+// routes/user.js
+router.get("/credibility/:user_id", async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const result = await db.query(`
+      SELECT 
+        u.id AS user_id,
+        u.email,
+        COALESCE(SUM(r.likes + r.verifications - r.disapprovals), 0) AS credibility_score
+      FROM user_data u
+      LEFT JOIN waterlogging_reports r ON u.id = r.user_id
+      WHERE u.id = $1
+      GROUP BY u.id;
+    `, [user_id]);
+
+    res.json({ credibility: result.rows[0]?.credibility_score || 0 });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 module.exports = router;

@@ -14,15 +14,6 @@ app.use(cors());
 
 
 
-
-const serverless = require("serverless-http");
-
-module.exports = app;
-module.exports.handler = serverless(app);
-
-
-
-
 const Police_data = require('./Police_data')
 const User_data = require('./User_data')
 
@@ -36,29 +27,61 @@ app.use('/api/user', User_data)
 // app.use("/api/csvPredict", predictRoutes);
 
 
-const roadGeometry = require("./data/roads_geometry.json");
 
+
+// app.get("/api/predictions", (req, res) => {
+//   const results = {};
+//   fs.createReadStream("data/waterlogging_monthly_predictions_2026.csv")
+//     .pipe(csv())
+//     .on("data", (row) => {
+//       const road = row.road_name;
+//       if (!results[road]) {
+//         const geometry =
+//           roadGeometry.find((r) => r.road_name === road)?.geometry || [];
+//         results[road] = { road_name: road, geometry, predictions: [] };
+//       }
+//       results[road].predictions.push({
+//         date: row.date,
+//         month: new Date(row.date).toLocaleString("default", { month: "short" }),
+//         occurrence: parseInt(row.pred_occurrence),
+//         duration: parseFloat(row.pred_duration),
+//       });
+//     })
+//     .on("end", () => {
+//       res.json(Object.values(results));
+//     });
+// });
+
+
+const roadGeometry = require("./data/roads_geometry.json");
 
 app.get("/api/predictions", (req, res) => {
   const results = {};
-  fs.createReadStream("data/waterlogging_monthly_predictions_2026.csv")
+
+  fs.createReadStream("data/dhanmondi_2026_predictions.csv")
     .pipe(csv())
     .on("data", (row) => {
       const road = row.road_name;
+
       if (!results[road]) {
         const geometry =
           roadGeometry.find((r) => r.road_name === road)?.geometry || [];
         results[road] = { road_name: road, geometry, predictions: [] };
       }
+
       results[road].predictions.push({
         date: row.date,
         month: new Date(row.date).toLocaleString("default", { month: "short" }),
-        occurrence: parseInt(row.pred_occurrence),
-        duration: parseFloat(row.pred_duration),
+        occurrence: parseInt(row.waterlogging_occurrence), // ← column name in your CSV
+        duration: parseFloat(row.waterlogging_duration), // ← column name in your CSV
       });
     })
     .on("end", () => {
       res.json(Object.values(results));
+    })
+    .on("error", (err) => {
+      console.error("CSV read error:", err);
+      res.status(500).json({ error: "Failed to read predictions CSV." });
     });
 });
 
@@ -69,20 +92,10 @@ app.get("/api/predictions", (req, res) => {
 
 
 
-
-
-
-
-
-
-
-// app.listen(5001, "0.0.0.0", () => {
-//   console.log("Server is running on port 5001");
-// });
-
-
-
-
-app.get("/", (req, res) => {
-  res.send("Backend is running on Vercel!");
+app.listen(5001,'0.0.0.0',() => {
+  console.log("Server is running on port 5001");
 });
+
+
+
+module.exports = app;
