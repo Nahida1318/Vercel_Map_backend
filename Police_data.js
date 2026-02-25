@@ -10,6 +10,7 @@ const { requireAdmin } = require("./authMiddleware");
 router.use(bodyParser.json());
 
 
+
 // Get all waterlogging reports with credibility
 router.get("/all", async (req, res) => {
   try {
