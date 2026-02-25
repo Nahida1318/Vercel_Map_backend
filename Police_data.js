@@ -103,7 +103,6 @@ router.delete("/deleteAll", async (req, res) => {
 
 
 
-// // Insert sample reports (for testing)
 router.post("/new", async (req, res) => {
   try {
     const query = `
@@ -219,12 +218,6 @@ router.post("/report", async (req, res) => {
     // Step 4: enforce current date
     const today = new Date().toISOString().split("T")[0];
     const fullDescription = [description, other].filter(Boolean).join(" | ");
-
-    // Step 5: insert report
-    // const result = await db.query(
-    //   "INSERT INTO waterlogging_reports (latitude, longitude, severity, description, date_reported) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-    //   [lat, lng, severity, fullDescription, today],
-    // );
 
     const result = await db.query(
       `INSERT INTO waterlogging_reports (latitude, longitude, severity, description, date_reported, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,

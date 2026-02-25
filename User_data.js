@@ -205,28 +205,34 @@ router.get("/favourite/:user_id", async (req, res) => {
   }
 });
 
-router.post("/rating/:user_id", async (req, res) => {
-  const user_id = req.params.user_id;
-  const { rating } = req.body;
-  console.log(user_id);
-  console.log(rating);
 
-  try {
-    // Query to find the user by email
-    const result = await db.query(
-      "UPDATE user_data\
-            SET rating = $1\
-            WHERE id = $2 RETURNING *",
-      [rating, user_id]
-    );
-    // Successfully authenticated
-    // Here you would typically assign a token or start a session
-    res.status(200).json({ message: "successful", result: result.rows[0] });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+
+
+
+// router.post("/rating/:user_id", async (req, res) => {
+//   const user_id = req.params.user_id;
+//   const { rating } = req.body;
+//   console.log(user_id);
+//   console.log(rating);
+
+//   try {
+//     const result = await db.query(
+//       "UPDATE user_data\
+//             SET rating = $1\
+//             WHERE id = $2 RETURNING *",
+//       [rating, user_id]
+//     );
+
+//     res.status(200).json({ message: "successful", result: result.rows[0] });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
+
+
+
+
 
 router.get("/user/:user_id", async (req, res) => {
   const user_id = req.params.user_id;
@@ -284,15 +290,6 @@ router.get("/credibility/:user_id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-
-
-
-
-
-
-
-
 
 
 
